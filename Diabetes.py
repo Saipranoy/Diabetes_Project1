@@ -13,7 +13,7 @@ from sklearn.metrics import confusion_matrix, accuracy_score, precision_score,re
 from sklearn.preprocessing import StandardScaler
 
 from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.tree import DecisionTreeClassifier, plot_tree
 # Get the file
 
 data = pd.read_csv("C:/Users/Sai Praneeth S/Desktop/Machine_learning_Project/diabetes.csv")
@@ -197,39 +197,132 @@ recall_score(y_test, upsampled_pred)
 # Checking F1- Score
 f1_score(y_test,upsampled_pred)
 
+###################################################################
 
-### Random Forest Regressor(rfr)
+# Finding Optimum Threshold to get max f1 score
 
-rfr = RandomForestRegressor(n_estimators = 10).fit(X_train, y_train)
+###################################################################
 
-rfr_pred = rfr.predict(X_test)
+y_pred_prob = upsampled.predict_proba(X_test)[:,1]
 
-# Accuracy Score
-accuracy_score(y_test, rfr_pred)
+thresholds = np.arange(0,1,0.01)
 
+precision_scores = []
+recall_scores = []
+f1_scores = []
 
+for threshold in thresholds:
+    
+    pred_class = (y_pred_prob >= threshold) * 1
+    
+    precision = precision_score(y_test, pred_class, zero_division = 0)
+    precision_scores.append(precision)
 
+    recall = recall_score(y_test, pred_class)
+    recall_scores.append(recall)
+ 
+    f1 = f1_score(y_test, pred_class)
+    f1_scores.append(f1)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+max_f1 = max(f1_scores)
+max_f1_idx = f1_scores.index(max_f1)
 
 
+plt.style.use("seaborn-poster")
+plt.plot(thresholds, precision_scores, label = "precision", linestyle = "--")
+plt.plot(thresholds, recall_scores, label = "recall", linestyle = "--")
+plt.plot(thresholds, f1_scores, label = "f1 score", linewidth = 5)
+plt.title(f"Finding the Optimal Threshold for Classification Model \n Maximum f1 Score :{round(max_f1,2)} at threshold {round(thresholds[max_f1_idx],2)} ")
+plt.xlabel("Threshold")
+plt.ylabel("Assesment Score")
+plt.legend(loc ="lower left")
+plt.tight_layout()
+plt.show()
+
+# To apply the optimal threshold to the data
+
+optimal_thresh = 0.39
+y_pred_opt_thresh = (y_pred_prob >= optimal_thresh) * 1
+
+accuracy_score(y_test,y_pred_opt_thresh)
+
+# Of all the observations, how many were actually positive
+precision_score(y_test, y_pred_opt_thresh)
+
+#of All the postive observations, how many were predicted positive
+recall_score(y_test, y_pred_opt_thresh)
+
+# Hormonic mean of precall and recall scores
+f1_score(y_test, y_pred_opt_thresh)
+
+##################################################################
+# Decision Tree Classification (dtc)
+########################################################################
+
+dtc = DecisionTreeClassifier(random_state=42, max_depth=9)
+dtc.fit(X_train, y_train)
+
+# Assesing the Model
+
+y_pred_dtc = dtc.predict(X_test)
+
+# Confusion Matrix
+
+conf_matrix_dtc = confusion_matrix( y_test, y_pred_dtc)
+
+plt.style.use("seaborn-poster")
+plt.matshow(conf_matrix_dtc, cmap = "coolwarm")
+plt.gca().xaxis.tick_bottom()
+plt.title("Confusion Matrix (Decision Tree Classification)")
+plt.xlabel("Predicted Values")
+plt.ylabel("Actual Values")
+for (i,j),corr_value in np.ndenumerate(conf_matrix_dtc):
+    plt.text(j,i,corr_value,ha = "center",va = "center", fontsize  = 20)
+plt.show()
+
+accuracy_score(y_test, y_pred_dtc)
+precision_score(y_test, y_pred_dtc)
+recall_score(y_test, y_pred_dtc)
+f1_score(y_test, y_pred_dtc)
+
+# Optimise the Max Depth
+
+max_depth = list(range(1,15))
+accuracy_list = []
+
+for depth in max_depth:
+    clf = DecisionTreeClassifier(max_depth  = depth, random_state = 42 )
+    clf.fit(X_train,y_train)
+    y_pred = clf.predict(X_test)
+    accuracy = f1_score(y_pred, y_test)
+    accuracy_list.append(accuracy)
+    
+max_accuracy = max(accuracy_list)
+max_accuracy_index = accuracy_list.index(max_accuracy)
+optimal_max_depth = max_depth[max_accuracy_index]
+
+
+# Plot of max_depths
+
+plt.plot(max_depth, accuracy_list)
+plt.scatter(optimal_max_depth, max_accuracy, marker = "x", color = "red")
+plt.title(f"Accuracy (F1 Score) by Max Depth \n Optimal Tree Depth:{optimal_max_depth} (Accuracy : {round(max_accuracy,4)})")
+plt.xlabel("Max Depth of Decission Tree")
+plt.ylabel("Accuracy (F1 Score)")
+plt.tight_layout()
+plt.show()
+
+# Plot our Model
+
+plt.figure(figsize=(25,15))
+tree = plot_tree(clf,
+                 feature_names = X.columns,
+                 filled = True,
+                 rounded = True,
+                 fontsize = 16)
+
+# With max_depth or stopping value for splitting the data as 12 we will have f1score 90% and then 
+# we can test the data after training with new stopping value to split data.
 
 
 
@@ -238,4 +331,17 @@ accuracy_score(y_test, rfr_pred)
 
 
 
-2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
