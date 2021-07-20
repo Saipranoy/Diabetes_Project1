@@ -14,10 +14,11 @@ from sklearn.preprocessing import StandardScaler
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier, plot_tree
+from sklearn.ensemble import RandomForestClassifier
 # Get the file
 
 data = pd.read_csv("C:/Users/Sai Praneeth S/Desktop/Machine_learning_Project/diabetes.csv")
-
+data.head(5)
 ##############################################################################
 
 # Dealing With Missing Values 
@@ -66,49 +67,49 @@ plt.show(p)  # Higher the pregancies higher you get diabetics
 p = sns.histplot(data = data, x = "BMI", hue = "Outcome", legend = False,binwidth = 2)
 p.set_title("Distribution of data by BMI Index", fontdict = {'fontsize': 18, 'fontweight':'bold'})
 sns.set(font_scale = 1)
-plt.legend(title = "Diabatics", loc = "right", labels = ["No","Yes"])
+plt.legend(title = "Diabatics", loc = "right", labels = ["Yes","No"])
 plt.tight_layout()
 plt.show(p) # There is no patternbut having BMI INdex between (24-30) have higher chance of getting diabetes 
 
 p = sns.histplot(data = data, x = "Age", hue = "Outcome", legend = False,binwidth = 3)
 p.set_title("Distribution of data by Age", fontdict = {'fontsize': 18, 'fontweight':'bold'})
 sns.set(font_scale = 1)
-plt.legend(title = "Diabatics", loc = "right", labels = ["No","Yes"])
+plt.legend(title = "Diabatics", loc = "right", labels = ["Yes","No"])
 plt.tight_layout()
 plt.show(p) # People of Age between (22-30) tend to get diabates 
 
 p = sns.histplot(data = data, x = "Glucose", hue = "Outcome", legend = False,binwidth = 4)
 p.set_title("Distribution of data by Glucose Levels",fontdict = {'fontsize': 18, 'fontweight':'bold'})
 sns.set(font_scale = 1)
-plt.legend(title = "Diabatics", loc = "right", labels = ["No","Yes"])
+plt.legend(title = "Diabatics", loc = "right", labels = ["Yes","No"])
 plt.tight_layout()
 plt.show(p) # People with Glucose levels between (80 - 128) tend to get diabates 
 
 p = sns.histplot(data = data, x = "SkinThickness", hue = "Outcome", legend = False,binwidth = 4)
 p.set_title("Distribution of data by SkinThickness",fontdict = {'fontsize': 18, 'fontweight':'bold'})
 sns.set(font_scale = 1)
-plt.legend(title = "Diabatics", loc = "right", labels = ["No","Yes"])
+plt.legend(title = "Diabatics", loc = "right", labels = ["Yes","No"])
 plt.tight_layout()
 plt.show(p) # having skin thickness between (27 - 32) tends to have diabates mostly
 
 p = sns.histplot(data = data, x = "Insulin", hue = "Outcome", legend = False,binwidth = 46)
 p.set_title("Distribution of data by Insulin", fontdict = {'fontsize': 18, 'fontweight':'bold'})
 sns.set(font_scale = 1)
-plt.legend(title = "Diabatics", loc = "right", labels = ["No","Yes"])
+plt.legend(title = "Diabatics", loc = "right", labels = ["Yes","No"])
 plt.tight_layout()
 plt.show(p) # Having Insulin levels between ( 108-154) generally get diabates
 
 p = sns.histplot(data = data, x = "BloodPressure", hue = "Outcome", legend = False,binwidth = 4)
 p.set_title("Distribution of data by Blood Pressure levels", fontdict = {'fontsize': 18, 'fontweight':'bold'})
 sns.set(font_scale = 1)
-plt.legend(title = "Diabatics", loc = "right", labels = ["No","Yes"])
+plt.legend(title = "Diabatics", loc = "right", labels = ["Yes","No"])
 plt.tight_layout()
 plt.show(p) # high BP levels leads to having diabatics
 
 p = sns.histplot(data = data, x = "DiabetesPedigreeFunction", hue = "Outcome", legend = False,binwidth = 0.41)
 p.set_title("Distribution of data by DiabetesPedigreeFunction", fontdict = {'fontsize': 18, 'fontweight':'bold'})
 sns.set(font_scale = 1)
-plt.legend(title = "Diabatics", loc = "right", labels = ["No","Yes"])
+plt.legend(title = "Diabatics", loc = "right", labels = ["Yes","No"])
 plt.tight_layout()
 plt.show(p) #  having below 0.91 degree function value leads to Diabetes
 
@@ -324,9 +325,18 @@ tree = plot_tree(clf,
 # With max_depth or stopping value for splitting the data as 12 we will have f1score 90% and then 
 # we can test the data after training with new stopping value to split data.
 
+######################################################################
+# Random Forest Classification (rfc)
+######################################################################
 
+rfc = RandomForestClassifier(random_state=42)
+rfc.fit(X_train, y_train)
 
+# Assesing the Model
 
+y_pred_rfc = rfc.predict(X_test)
+
+accuracy_score(y_test, y_pred_rfc)
 
 
 
